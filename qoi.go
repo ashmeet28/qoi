@@ -14,6 +14,8 @@ const (
 
 var qoiMagic []uint8 = []byte("qoif")
 
+var qoiPadding []uint8 = []byte{0, 0, 0, 0, 0, 0, 0, 1}
+
 type qoiHeader struct {
 	width      uint32
 	height     uint32
@@ -29,8 +31,7 @@ type qoiRGBA struct {
 }
 
 func qoiColorHash(c qoiRGBA) uint8 {
-	return uint8((uint32(c.r)*3 + uint32(c.g)*5 + uint32(c.b)*7 + uint32(c.a)*11) % 64)
+	return (c.r*3 + c.g*5 + c.b*7 + c.a*11) % 64
 }
 func main() {
-	print(qoiMagic)
 }
