@@ -82,12 +82,12 @@ func Encode(data []byte, desc Header) []byte {
 		if px == pxPrev {
 			pxRun += 1
 			if pxRun == 62 || pxPos == pxEnd {
-				encData = append(encData, opRun|pxRun)
+				encData = append(encData, opRun|(pxRun-1))
 				pxRun = 0
 			}
 		} else {
 			if pxRun > 0 {
-				encData = append(encData, opRun|pxRun)
+				encData = append(encData, opRun|(pxRun-1))
 				pxRun = 0
 			}
 
