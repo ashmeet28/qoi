@@ -46,8 +46,6 @@ func Encode(data []byte, desc Header) []byte {
 	var px pxRGBA
 	var pxPrev pxRGBA
 
-	var pxChannels uint8
-
 	var encData []byte
 
 	var pxPos uint32
@@ -71,14 +69,13 @@ func Encode(data []byte, desc Header) []byte {
 
 	pxLen = desc.width * desc.height * uint32(desc.channels)
 	pxEnd = pxLen - uint32(desc.channels)
-	pxChannels = desc.channels
 
-	for pxPos = 0; pxPos < pxLen; pxPos += uint32(pxChannels) {
+	for pxPos = 0; pxPos < pxLen; pxPos += uint32(desc.channels) {
 		px.r = data[pxPos]
 		px.g = data[pxPos+1]
 		px.b = data[pxPos+2]
 
-		if pxChannels == 4 {
+		if desc.channels == 4 {
 			px.a = data[pxPos+3]
 		}
 
