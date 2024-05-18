@@ -46,17 +46,17 @@ func Encode(data []byte, desc qoiHeader) []byte {
 
 	var pxChannels uint8
 
-	var encodedData []byte
+	var encData []byte
 
 	var pxPos uint32
 	var pxLen uint32
 	var pxEnd uint32
 
-	encodedData = append(encodedData, qoiMagic...)
-	encodedData = binary.BigEndian.AppendUint32(encodedData, desc.width)
-	encodedData = binary.BigEndian.AppendUint32(encodedData, desc.height)
-	encodedData = append(encodedData, desc.channels)
-	encodedData = append(encodedData, desc.colorspace)
+	encData = append(encData, qoiMagic...)
+	encData = binary.BigEndian.AppendUint32(encData, desc.width)
+	encData = binary.BigEndian.AppendUint32(encData, desc.height)
+	encData = append(encData, desc.channels)
+	encData = append(encData, desc.colorspace)
 
 	pxRun = 0
 
@@ -90,19 +90,19 @@ func Encode(data []byte, desc qoiHeader) []byte {
 		if px == pxPrev {
 			pxRun += 1
 			if pxRun == 62 || pxPos == pxEnd {
-				encodedData = append(encodedData, qoiOpRun|pxRun)
+				encData = append(encData, qoiOpRun|pxRun)
 				pxRun = 0
 			}
 		} else {
 			if pxRun > 0 {
-				encodedData = append(encodedData, qoiOpRun|pxRun)
+				encData = append(encData, qoiOpRun|pxRun)
 				pxRun = 0
 			}
 
 			pxIndexPos := qoiColorHash(px)
 
 			if pxIndex[pxIndexPos] == px {
-				encodedData = append(encodedData, qoiOpIndex|pxIndexPos)
+				encData = append(encData, qoiOpIndex|pxIndexPos)
 			} else {
 				pxIndex[pxIndexPos] = px
 
@@ -117,25 +117,25 @@ func Encode(data []byte, desc qoiHeader) []byte {
 					if vr > 253 && vr < 2 &&
 						vg > 253 && vg < 2 &&
 						vb > 253 && vb < 2 {
-						encodedData = append(encodedData, qoiOpDiff|((vr+2)<<4)|((vg+2)<<2)|(vb+2))
+						encData = append(encData, qoiOpDiff|((vr+2)<<4)|((vg+2)<<2)|(vb+2))
 					} else if vgr > 247 && vgr < 8 &&
 						vg > 223 && vg < 32 &&
 						vgb > 247 && vgb < 8 {
-						encodedData = append(encodedData, qoiOpLuma|(vg+32), ((vgr+8)<<4)|(vgb+8))
+						encData = append(encData, qoiOpLuma|(vg+32), ((vgr+8)<<4)|(vgb+8))
 					} else {
-						encodedData = append(encodedData, qoiOpRGB, px.r, px.g, px.b)
+						encData = append(encData, qoiOpRGB, px.r, px.g, px.b)
 					}
 				} else {
-					encodedData = append(encodedData, qoiOpRGBA, px.r, px.g, px.b, px.a)
+					encData = append(encData, qoiOpRGBA, px.r, px.g, px.b, px.a)
 				}
 			}
 		}
 		pxPrev = px
 	}
 
-	encodedData = append(encodedData, qoiPadding...)
+	encData = append(encData, qoiPadding...)
 
-	return encodedData
+	return encData
 }
 
 func Decode() {}
