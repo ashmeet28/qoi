@@ -94,7 +94,9 @@ func Encode(data []byte, desc Header) []byte {
 			pxIndexPos := pxHash(px)
 
 			if pxIndex[pxIndexPos] == px {
+
 				encData = append(encData, opIndex|pxIndexPos)
+
 			} else {
 				pxIndex[pxIndexPos] = px
 
@@ -106,16 +108,18 @@ func Encode(data []byte, desc Header) []byte {
 					var vgr uint8 = vr - vg
 					var vgb uint8 = vb - vg
 
-					if vr > 253 && vr < 2 &&
-						vg > 253 && vg < 2 &&
-						vb > 253 && vb < 2 {
+					if vr > 253 && vr < 2 && vg > 253 && vg < 2 && vb > 253 && vb < 2 {
+
 						encData = append(encData, opDiff|((vr+2)<<4)|((vg+2)<<2)|(vb+2))
-					} else if vgr > 247 && vgr < 8 &&
-						vg > 223 && vg < 32 &&
-						vgb > 247 && vgb < 8 {
+
+					} else if vgr > 247 && vgr < 8 && vg > 223 && vg < 32 && vgb > 247 && vgb < 8 {
+
 						encData = append(encData, opLuma|(vg+32), ((vgr+8)<<4)|(vgb+8))
+
 					} else {
+
 						encData = append(encData, opRGB, px.r, px.g, px.b)
+
 					}
 				} else {
 					encData = append(encData, opRGBA, px.r, px.g, px.b, px.a)
