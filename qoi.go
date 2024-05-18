@@ -1,6 +1,8 @@
 package qoi
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+)
 
 var ColorspaceSRGB uint8 = 0
 var ColorspaceLinear uint8 = 1
@@ -71,13 +73,6 @@ func Encode(data []byte, desc Header) []byte {
 	pxEnd = pxLen - uint32(desc.channels)
 	pxChannels = desc.channels
 
-	for i := range pxIndex {
-		pxIndex[i].r = 0
-		pxIndex[i].g = 0
-		pxIndex[i].b = 0
-		pxIndex[i].a = 0
-	}
-
 	for pxPos = 0; pxPos < pxLen; pxPos += uint32(pxChannels) {
 		px.r = data[pxPos]
 		px.g = data[pxPos+1]
@@ -138,4 +133,5 @@ func Encode(data []byte, desc Header) []byte {
 	return encData
 }
 
-func Decode() {}
+func Decode() {
+}
