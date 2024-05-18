@@ -65,10 +65,7 @@ func Encode(data []byte, desc qoiHeader) []byte {
 	pxPrev.b = 0
 	pxPrev.a = 255
 
-	px.r = 0
-	px.g = 0
-	px.b = 0
-	px.a = 255
+	px = pxPrev
 
 	pxLen = desc.width * desc.height * uint32(desc.channels)
 	pxEnd = pxLen - uint32(desc.channels)
@@ -90,7 +87,7 @@ func Encode(data []byte, desc qoiHeader) []byte {
 			px.a = data[pxPos+3]
 		}
 
-		if px.r == pxPrev.r && px.g == pxPrev.g && px.b == pxPrev.b && px.a == pxPrev.a {
+		if px == pxPrev {
 			pxRun += 1
 			if pxRun == 62 || pxPos == pxEnd {
 				encodedData = append(encodedData, qoiOpRun|pxRun)
@@ -104,10 +101,7 @@ func Encode(data []byte, desc qoiHeader) []byte {
 
 			pxIndexPos := qoiColorHash(px)
 
-			if pxIndex[pxIndexPos].r == px.r &&
-				pxIndex[pxIndexPos].g == px.g &&
-				pxIndex[pxIndexPos].b == px.b &&
-				pxIndex[pxIndexPos].a == px.a {
+			if pxIndex[pxIndexPos] == px {
 				encodedData = append(encodedData, qoiOpIndex|pxIndexPos)
 			} else {
 				pxIndex[pxIndexPos] = px
@@ -136,10 +130,7 @@ func Encode(data []byte, desc qoiHeader) []byte {
 				}
 			}
 		}
-		pxPrev.r = px.r
-		pxPrev.g = px.g
-		pxPrev.b = px.b
-		pxPrev.a = px.a
+		pxPrev = px
 	}
 
 	encodedData = append(encodedData, qoiPadding...)
