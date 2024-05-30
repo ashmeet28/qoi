@@ -122,7 +122,9 @@ func Encode(data []byte, desc Header) []byte {
 
 					}
 				} else {
+
 					encData = append(encData, opRGBA, px.r, px.g, px.b, px.a)
+
 				}
 			}
 		}
