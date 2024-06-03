@@ -191,6 +191,7 @@ func Decode(data []byte, channels uint8) (Header, []byte) {
 				px.r = data[0]
 				px.g = data[1]
 				px.b = data[2]
+
 				data = data[3:]
 
 			} else if b1 == opRGBA {
@@ -199,6 +200,7 @@ func Decode(data []byte, channels uint8) (Header, []byte) {
 				px.g = data[1]
 				px.b = data[2]
 				px.a = data[3]
+
 				data = data[4:]
 
 			} else if (b1 & 0b11000000) == opIndex {
