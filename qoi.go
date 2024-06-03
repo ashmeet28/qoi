@@ -153,7 +153,7 @@ func Decode(data []byte, channels uint8) (Header, []byte) {
 
 	var decData []byte
 
-	data = data[len(magic) : len(data)-len(padding)]
+	data = data[len(magic):]
 
 	desc.width = binary.BigEndian.Uint32(data[:4])
 	data = data[4:]
@@ -181,7 +181,7 @@ func Decode(data []byte, channels uint8) (Header, []byte) {
 
 			pxRun--
 
-		} else {
+		} else if len(data) > len(padding) {
 
 			b1 := data[0]
 			data = data[1:]
