@@ -101,20 +101,27 @@ func Encode(data []byte, desc Header) []byte {
 				pxIndex[pxIndexPos] = px
 
 				if px.a == pxPrev.a {
-					var vr int8 = int8(px.r) - int8(pxPrev.r)
-					var vg int8 = int8(px.g) - int8(pxPrev.g)
-					var vb int8 = int8(px.b) - int8(pxPrev.b)
+					var vr int8 = int8(px.r - pxPrev.r)
+					var vg int8 = int8(px.g - pxPrev.g)
+					var vb int8 = int8(px.b - pxPrev.b)
 
 					var vgr int8 = vr - vg
 					var vgb int8 = vb - vg
 
-					if vr > -3 && vr < 2 && vg > -3 && vg < 2 && vb > -3 && vb < 2 {
+					if vr > -3 && vr < 2 &&
+						vg > -3 && vg < 2 &&
+						vb > -3 && vb < 2 {
 
-						encData = append(encData, opDiff|(uint8(vr+2)<<4)|(uint8(vg+2)<<2)|uint8(vb+2))
+						encData = append(encData,
+							opDiff|(uint8(vr+2)<<4)|(uint8(vg+2)<<2)|uint8(vb+2))
 
-					} else if vgr > -9 && vgr < 8 && vg > -33 && vg < 32 && vgb > -9 && vgb < 8 {
+					} else if vgr > -9 && vgr < 8 &&
+						vg > -33 && vg < 32 &&
+						vgb > -9 && vgb < 8 {
 
-						encData = append(encData, opLuma|uint8(vg+32), (uint8(vgr+8)<<4)|uint8(vgb+8))
+						encData = append(encData,
+							opLuma|uint8(vg+32),
+							(uint8(vgr+8)<<4)|uint8(vgb+8))
 
 					} else {
 
