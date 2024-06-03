@@ -9,6 +9,7 @@ import (
 
 func TestQOIEncodeOrDecode(t *testing.T) {
 	a := os.Args[3:]
+
 	op := a[0]
 	w, _ := strconv.ParseInt(a[1], 10, 32)
 	h, _ := strconv.ParseInt(a[2], 10, 32)
