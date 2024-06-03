@@ -168,12 +168,14 @@ func Decode(data []byte, channels uint8) (Header, []byte) {
 		channels = desc.channels
 	}
 
+	var pxLen uint32 = desc.width * desc.height * uint32(channels)
+
 	px.r = 0
 	px.g = 0
 	px.b = 0
 	px.a = 255
 
-	for len(decData) < int(desc.width*desc.height*uint32(channels)) {
+	for len(decData) < int(pxLen) {
 
 		if pxRun > 0 {
 
