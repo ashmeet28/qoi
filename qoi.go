@@ -105,8 +105,8 @@ func Encode(data []byte, desc Header) []byte {
 					var vg int8 = int8(px.g - pxPrev.g)
 					var vb int8 = int8(px.b - pxPrev.b)
 
-					var vgr int8 = vr - vg
-					var vgb int8 = vb - vg
+					var vgr int8 = int8((px.r - pxPrev.r) - (px.g - pxPrev.g))
+					var vgb int8 = int8((px.b - pxPrev.b) - (px.g - pxPrev.g))
 
 					if vr > -3 && vr < 2 &&
 						vg > -3 && vg < 2 &&
@@ -120,8 +120,7 @@ func Encode(data []byte, desc Header) []byte {
 						vgb > -9 && vgb < 8 {
 
 						encData = append(encData,
-							opLuma|uint8(vg+32),
-							(uint8(vgr+8)<<4)|uint8(vgb+8))
+							opLuma|uint8(vg+32), (uint8(vgr+8)<<4)|uint8(vgb+8))
 
 					} else {
 
@@ -143,5 +142,99 @@ func Encode(data []byte, desc Header) []byte {
 	return encData
 }
 
-func Decode() {
+func Decode(data []byte, channels uint8) (Header, []byte) {
+	var desc Header
+
+	var pxRun uint8
+
+	var pxIndex []pxRGBA = make([]pxRGBA, 64)
+
+	var px pxRGBA
+
+	var decData []byte
+
+	data = data[len(magic) : len(data)-len(padding)]
+
+	desc.width = binary.BigEndian.Uint32(data[:4])
+	data = data[4:]
+	desc.height = binary.BigEndian.Uint32(data[:4])
+	data = data[4:]
+	desc.channels = data[0]
+	data = data[1:]
+	desc.colorspace = data[0]
+	data = data[1:]
+
+	if channels == 0 {
+		channels = desc.channels
+	}
+
+	px.r = 0
+	px.g = 0
+	px.b = 0
+	px.a = 255
+
+	for len(decData) < int(desc.width*desc.height*uint32(channels)) {
+
+		if pxRun > 0 {
+
+			pxRun--
+
+		} else {
+
+			b1 := data[0]
+			data = data[1:]
+
+			if b1 == opRGB {
+
+				px.r = data[0]
+				px.g = data[1]
+				px.b = data[2]
+				data = data[3:]
+
+			} else if b1 == opRGBA {
+
+				px.r = data[0]
+				px.g = data[1]
+				px.b = data[2]
+				px.a = data[3]
+				data = data[4:]
+
+			} else if (b1 & 0b11000000) == opIndex {
+
+				px = pxIndex[b1]
+
+			} else if (b1 & 0b11000000) == opDiff {
+
+				px.r += ((b1 >> 4) & 0x03) - 2
+				px.g += ((b1 >> 2) & 0x03) - 2
+				px.b += (b1 & 0x03) - 2
+
+			} else if (b1 & 0b11000000) == opLuma {
+
+				b2 := data[0]
+				data = data[1:]
+
+				var vg uint8 = (b1 & 0x3f) - 32
+				px.r += (vg - 8) + ((b2 >> 4) & 0x0f)
+				px.g += vg
+				px.b += (vg - 8) + (b2 & 0x0f)
+
+			} else if (b1 & 0b11000000) == opRun {
+
+				pxRun = b1 & 0x3f
+
+			}
+
+			pxIndex[pxHash(px)] = px
+		}
+
+		decData = append(decData, px.r, px.g, px.b)
+
+		if channels == 4 {
+			decData = append(decData, px.a)
+		}
+
+	}
+
+	return desc, decData
 }
